@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="ext-resource-dependency" content="./data/movies.js" data-resource-id="moviesData" />
+<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js">
+<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<link rel="modulepreload" href="./data/movies.js">
+<script src="./support.js"></script>
+</head>
+<template id="__bundler_thumbnail" data-bg-color="#211d18">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#211d18"/>
+    <rect x="360" y="300" width="26" height="90" rx="4" fill="#e0533b"/>
+    <text x="410" y="378" font-family="sans-serif" font-size="86" font-weight="800" fill="#f0ece6">BIFAN</text>
+    <rect x="360" y="430" width="480" height="12" rx="6" fill="#4a443c"/>
+    <rect x="360" y="462" width="360" height="12" rx="6" fill="#4a443c"/>
+  </svg>
+</template>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
+<style>
+  html,body{margin:0;padding:0;background:oklch(0.15 0.008 60);}
+  *{box-sizing:border-box;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:oklch(0.34 0.01 60);border-radius:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+</style>
+</helmet>
+<div style="min-height:100vh;background:oklch(0.15 0.008 60);color:oklch(0.94 0.005 80);font-family:'Pretendard',system-ui,sans-serif;padding:0 0 80px;">
+
+  <div style="max-width:1240px;margin:0 auto;padding:0 28px;">
+
+    <header style="padding:44px 0 26px;border-bottom:1px solid oklch(0.28 0.01 60);">
+      <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+        <div style="width:11px;height:34px;background:oklch(0.63 0.21 25);border-radius:2px;transform:translateY(3px);"></div>
+        <h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.02em;">{{ t.title }}</h1>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:oklch(0.62 0.01 70);font-weight:500;">{{ t.fest }}</span>
+      </div>
+      <sc-if value="{{ isKo }}" hint-placeholder-val="{{ true }}">
+        <p style="margin:14px 0 0;color:oklch(0.62 0.01 70);font-size:14px;max-width:680px;line-height:1.6;">
+          랭킹은 <b style="color:oklch(0.82 0.02 70);">S · A · B · C · D · E</b> 순, 등급 없는 작품은 <b style="color:oklch(0.82 0.02 70);">–</b>. 상영일시순은 러닝타임(<b style="color:oklch(0.82 0.02 70);">시작~종료</b>)을 반영한 <b style="color:oklch(0.82 0.02 70);">시간표</b>로 보여주며, 같은 시간대에 겹치는 상영은 나란한 블록으로 표시됩니다.
+        </p>
+        <p style="margin:12px 0 0;color:oklch(0.72 0.02 55);font-size:13.5px;max-width:720px;line-height:1.65;"><b style="color:oklch(0.82 0.03 55);">프로필</b>을 추가하면 나만의 랭킹을 자유롭게 매길 수 있습니다. 기존에는 프로필이 만든 기기에서만 보였지만, 이제 개선되어 <b style="color:oklch(0.82 0.03 55);">모든 브라우저에서 동일한 프로필</b>이 표시됩니다.</p>
+        <sc-if value="{{ activeIsBase }}" hint-placeholder-val="{{ true }}"><p style="margin:10px 0 0;color:oklch(0.6 0.01 70);font-size:13.5px;max-width:720px;line-height:1.65;">
+          랭킹은 <b style="color:oklch(0.82 0.02 70);">일본에서 접하기 쉬운지 여부 · 이벤트(GV·메가토크 등) 진행 여부 · 개인 취향</b>을 기준으로 매겼습니다. 제가 <b style="color:oklch(0.82 0.02 70);">못 보는 시간대</b>의 상영은 흐린 항목·빗금친 블록으로 구분해 두었고, 랭킹이 <b style="color:oklch(0.82 0.02 70);">–</b>인 작품은 아직 확인하지 않은 것입니다.
+        </p></sc-if>
+      </sc-if>
+      <sc-if value="{{ isJa }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:14px 0 0;color:oklch(0.62 0.01 70);font-size:14px;max-width:720px;line-height:1.6;">
+          ランキングは <b style="color:oklch(0.82 0.02 70);">S · A · B · C · D · E</b> 順、レーティングのない作品は <b style="color:oklch(0.82 0.02 70);">–</b>。上映日時順は上映時間（<b style="color:oklch(0.82 0.02 70);">開始〜終了</b>）を反映した<b style="color:oklch(0.82 0.02 70);">タイムテーブル</b>で表示し、同じ時間帯に重なる上映は横並びのブロックで表示されます。
+        </p>
+        <p style="margin:12px 0 0;color:oklch(0.72 0.02 55);font-size:13.5px;max-width:760px;line-height:1.65;"><b style="color:oklch(0.82 0.03 55);">プロフィール</b>を追加すると自分だけのランキングを自由に付けられます。以前はプロフィールが作成した端末でしか見られませんでしたが、改善され、<b style="color:oklch(0.82 0.03 55);">すべてのブラウザで同じプロフィール</b>が表示されるようになりました。</p>
+        <sc-if value="{{ activeIsBase }}" hint-placeholder-val="{{ true }}"><p style="margin:10px 0 0;color:oklch(0.6 0.01 70);font-size:13.5px;max-width:760px;line-height:1.65;">
+          ランキングは<b style="color:oklch(0.82 0.02 70);">日本で接しやすいか・イベント（GV・メガトーク等）の有無・個人の好み</b>を基準に付けています。私が<b style="color:oklch(0.82 0.02 70);">観られない時間帯</b>の上映は薄い項目・斜線のブロックで区別し、ランキングが<b style="color:oklch(0.82 0.02 70);">–</b>の作品はまだ確認していないものです。
+        </p></sc-if>
+      </sc-if>
+    </header>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:18px 0 2px;">
+      <span style="font-size:11.5px;font-weight:700;letter-spacing:0.06em;color:oklch(0.55 0.01 70);text-transform:uppercase;margin-right:2px;">{{ t.profileLabel }}</span>
+      <sc-for list="{{ profilePills }}" as="p" hint-placeholder-count="1">
+        <button onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.name }}</button>
+      </sc-for>
+      <sc-if value="{{ nameEditingOff }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ addProfile }}" style="font-family:'Pretendard',sans-serif;font-size:13px;font-weight:600;padding:7px 14px;border:1px dashed oklch(0.4 0.01 60);border-radius:999px;cursor:pointer;background:transparent;color:oklch(0.7 0.01 70);white-space:nowrap;">{{ t.addProfileTxt }}</button>
+        <sc-if value="{{ activeIsCustom }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ startRename }}" style="font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:6px 11px;border:1px solid oklch(0.3 0.01 60);border-radius:8px;cursor:pointer;background:oklch(0.2 0.01 60);color:oklch(0.66 0.01 70);white-space:nowrap;">{{ t.rename }}</button>
+          <sc-if value="{{ confirmDelOff }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ requestDelete }}" style="font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:6px 11px;border:1px solid oklch(0.4 0.06 25);border-radius:8px;cursor:pointer;background:transparent;color:oklch(0.62 0.12 25);white-space:nowrap;">{{ t.del }}</button>
+          </sc-if>
+          <sc-if value="{{ confirmDel }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ confirmDelete }}" style="font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:700;padding:6px 11px;border:1px solid oklch(0.55 0.18 25);border-radius:8px;cursor:pointer;background:oklch(0.5 0.16 25);color:oklch(0.98 0.01 80);white-space:nowrap;">{{ t.delConfirm }}</button>
+            <button onClick="{{ cancelDelete }}" style="font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:6px 11px;border:1px solid oklch(0.3 0.01 60);border-radius:8px;cursor:pointer;background:oklch(0.2 0.01 60);color:oklch(0.66 0.01 70);white-space:nowrap;">{{ t.cancel }}</button>
+          </sc-if>
+        </sc-if>
+      </sc-if>
+      <sc-if value="{{ nameEditing }}" hint-placeholder-val="{{ false }}">
+        <input value="{{ nameEditVal }}" onInput="{{ onNameInput }}" onKeyDown="{{ onNameKey }}" placeholder="{{ t.namePh }}" style="width:190px;background:oklch(0.2 0.01 60);border:1px solid oklch(0.63 0.21 25);border-radius:9px;color:oklch(0.94 0.005 80);font-family:'Pretendard',sans-serif;font-size:13.5px;padding:8px 13px;outline:none;" />
+        <button onClick="{{ commitName }}" style="font-family:'Pretendard',sans-serif;font-size:13px;font-weight:700;padding:8px 15px;border:none;border-radius:9px;cursor:pointer;background:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);white-space:nowrap;">{{ t.confirm }}</button>
+        <button onClick="{{ cancelName }}" style="font-family:'Pretendard',sans-serif;font-size:13px;font-weight:600;padding:8px 13px;border:1px solid oklch(0.3 0.01 60);border-radius:9px;cursor:pointer;background:oklch(0.2 0.01 60);color:oklch(0.66 0.01 70);white-space:nowrap;">{{ t.cancel }}</button>
+      </sc-if>
+    </div>
+    <sc-if value="{{ activeIsCustom }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:9px;background:oklch(0.2 0.012 60);border:1px solid oklch(0.3 0.01 60);border-radius:10px;padding:11px 15px;margin:10px 0 2px;color:oklch(0.72 0.01 70);font-size:13px;line-height:1.5;">
+        <span style="font-size:15px;">✏️</span>{{ t.editHint }}
+      </div>
+    </sc-if>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 0 14px;position:sticky;top:0;background:oklch(0.15 0.008 60);z-index:20;">
+      <div style="display:inline-flex;background:oklch(0.2 0.01 60);border:1px solid oklch(0.3 0.01 60);border-radius:11px;padding:4px;gap:4px;">
+        <button onClick="{{ setRank }}" style="{{ segRankStyle }}">{{ seg1Label }}</button>
+        <button onClick="{{ setTime }}" style="{{ segTimeStyle }}">{{ t.time }}</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="{{ t.searchPh }}" style="width:270px;background:oklch(0.2 0.01 60);border:1px solid oklch(0.3 0.01 60);border-radius:10px;color:oklch(0.94 0.005 80);font-family:'Pretendard',sans-serif;font-size:14px;padding:10px 14px;outline:none;" style-focus="border-color:oklch(0.63 0.21 25);" />
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:oklch(0.62 0.01 70);white-space:nowrap;">{{ count }}{{ t.unit }}</span>
+        <button onClick="{{ toggleLang }}" style="{{ langBtnStyle }}"><span style="font-size:13px;">🌐</span>{{ t.langBtn }}</button>
+      </div>
+    </div>
+
+    <div style="padding:2px 0 18px;">
+      <button onClick="{{ toggleVenueMode }}" style="display:inline-flex;align-items:center;gap:9px;background:oklch(0.2 0.01 60);border:1px solid oklch(0.3 0.01 60);border-radius:10px;padding:8px 15px;color:oklch(0.86 0.01 70);font-family:'Pretendard',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;">
+        <span style="{{ venueBoxStyle }}">{{ venueCheck }}</span> {{ t.venueMode }}
+      </button>
+      <sc-if value="{{ showVenueBar }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;">
+          <span style="font-size:11.5px;font-weight:700;letter-spacing:0.06em;color:oklch(0.55 0.01 70);text-transform:uppercase;margin-right:2px;">{{ t.venueLabel }}</span>
+          <sc-for list="{{ buildingButtons }}" as="b" hint-placeholder-count="6">
+            <button onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ isTime }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px 0 20px;">
+        <span style="font-size:11.5px;font-weight:700;letter-spacing:0.06em;color:oklch(0.55 0.01 70);text-transform:uppercase;margin-right:4px;">{{ t.dayLabel }}</span>
+        <sc-for list="{{ dayTabs }}" as="t" hint-placeholder-count="5">
+          <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- CATEGORY (부문별) VIEW — 메인 tab, view only -->
+    <sc-if value="{{ isCatView }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ venuePopoverOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closeVenue }}" style="position:fixed;inset:0;z-index:25;"></div></sc-if>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px 0 22px;">
+        <span style="font-size:11.5px;font-weight:700;letter-spacing:0.06em;color:oklch(0.55 0.01 70);text-transform:uppercase;margin-right:2px;">{{ t.jumpLabel }}</span>
+        <sc-for list="{{ catJumpButtons }}" as="c" hint-placeholder-count="6">
+          <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+      <sc-for list="{{ catSections }}" as="s" hint-placeholder-count="3">
+        <div id="{{ s.id }}" style="margin-bottom:34px;scroll-margin-top:80px;">
+          <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:13px;padding-bottom:10px;border-bottom:2px solid oklch(0.3 0.01 60);">
+            <span style="width:9px;height:22px;background:oklch(0.63 0.21 25);border-radius:2px;transform:translateY(4px);display:inline-block;flex:none;"></span>
+            <span style="font-size:19px;font-weight:800;letter-spacing:-0.01em;">{{ s.name }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:oklch(0.6 0.01 70);">{{ s.count }}{{ t.unit }}</span>
+          </div>
+          <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+            <div style="border:1px solid oklch(0.28 0.01 60);border-radius:14px;overflow:visible;background:oklch(0.175 0.008 60);">
+              <sc-for list="{{ s.films }}" as="m" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:minmax(260px,2fr) 160px 200px 150px 96px;align-items:center;padding:15px 20px;border-bottom:1px solid oklch(0.24 0.008 60);{{ m.dimStyle }}" style-hover="background:oklch(0.2 0.01 60);">
+                  <div style="padding-right:18px;min-width:0;">
+                    <div style="font-size:15.5px;font-weight:600;letter-spacing:-0.01em;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">{{ m.ko }}<sc-if value="{{ m.isNew }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:oklch(0.7 0.008 70);background:oklch(0.28 0.006 60);border:1px dashed oklch(0.42 0.01 60);border-radius:5px;padding:2px 7px;">{{ t.newBadge }}</span></sc-if></div>
+                    <div style="font-size:12.5px;color:oklch(0.58 0.01 70);margin-top:3px;line-height:1.3;">{{ m.en }}</div>
+                  </div>
+                  <div style="position:relative;padding-right:12px;">
+                    <sc-if value="{{ m.venueSingle }}" hint-placeholder-val="{{ true }}">
+                      <a href="{{ m.venueUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:13px;color:oklch(0.82 0.03 220);line-height:1.4;text-decoration:none;border-bottom:1px dotted oklch(0.5 0.03 220);cursor:pointer;" style-hover="color:oklch(0.9 0.05 220);">{{ m.venue }}<span style="font-size:11px;">↗</span></a>
+                    </sc-if>
+                    <sc-if value="{{ m.venueMulti }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ m.toggleVenue }}" style="display:inline-flex;align-items:center;gap:4px;font-family:'Pretendard',sans-serif;font-size:13px;color:oklch(0.82 0.03 220);line-height:1.4;text-align:left;background:none;border:none;border-bottom:1px dotted oklch(0.5 0.03 220);padding:0;cursor:pointer;">{{ m.venue }}<span style="font-size:9px;">▼</span></button>
+                      <sc-if value="{{ m.venueOpen }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute;top:calc(100% + 8px);left:0;z-index:30;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:11px;padding:8px;box-shadow:0 10px 30px oklch(0.1 0.01 60 / 0.6);min-width:210px;display:flex;flex-direction:column;gap:4px;">
+                          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:oklch(0.55 0.01 70);text-transform:uppercase;padding:2px 6px 5px;">{{ t.mapLabel }}</div>
+                          <sc-for list="{{ m.venueChips }}" as="c" hint-placeholder-count="2">
+                            <a href="{{ c.url }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;color:oklch(0.9 0.005 80);background:oklch(0.25 0.012 60);border:1px solid oklch(0.32 0.01 60);border-radius:8px;padding:9px 12px;text-decoration:none;" style-hover="background:oklch(0.63 0.21 25);border-color:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);">{{ c.display }}<span>↗</span></a>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </sc-if>
+                  </div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:oklch(0.85 0.01 80);line-height:1.55;padding-right:12px;">{{ m.showtime }}</div>
+                  <div style="font-size:12.5px;color:oklch(0.68 0.01 70);line-height:1.4;padding-right:12px;">{{ m.rating }}</div>
+                  <div style="text-align:right;">
+                    <sc-if value="{{ m.hasLink }}" hint-placeholder-val="{{ true }}"><a href="{{ m.link }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:oklch(0.15 0.008 60);background:oklch(0.63 0.21 25);padding:8px 13px;border-radius:8px;text-decoration:none;" style-hover="background:oklch(0.68 0.21 25);">{{ t.view }} ↗</a></sc-if>
+                    <sc-if value="{{ m.noLink }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:oklch(0.44 0.008 70);">–</span></sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <sc-for list="{{ s.films }}" as="m" hint-placeholder-count="3">
+                <div style="border:1px solid oklch(0.28 0.01 60);border-radius:13px;background:oklch(0.185 0.008 60);padding:14px;{{ m.dimStyle }}">
+                  <div style="display:flex;align-items:flex-start;gap:11px;">
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:16px;font-weight:700;letter-spacing:-0.01em;line-height:1.3;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">{{ m.ko }}<sc-if value="{{ m.isNew }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;color:oklch(0.7 0.008 70);background:oklch(0.28 0.006 60);border:1px dashed oklch(0.42 0.01 60);border-radius:5px;padding:2px 6px;">{{ t.newBadge }}</span></sc-if></div>
+                      <div style="font-size:12.5px;color:oklch(0.58 0.01 70);margin-top:3px;line-height:1.3;">{{ m.en }}</div>
+                    </div>
+                    <sc-if value="{{ m.hasLink }}" hint-placeholder-val="{{ true }}"><a href="{{ m.link }}" target="_blank" rel="noopener" style="flex:none;display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;color:oklch(0.15 0.008 60);background:oklch(0.63 0.21 25);padding:8px 12px;border-radius:8px;text-decoration:none;">{{ t.view }} ↗</a></sc-if>
+                  </div>
+                  <div style="margin-top:11px;"><span style="font-size:12px;color:oklch(0.68 0.01 70);">{{ m.rating }}</span></div>
+                  <div style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding-top:11px;border-top:1px solid oklch(0.26 0.008 60);">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:oklch(0.82 0.01 80);line-height:1.5;flex:1;min-width:0;">{{ m.showtime }}</div>
+                    <div style="position:relative;flex:none;text-align:right;">
+                      <sc-if value="{{ m.venueSingle }}" hint-placeholder-val="{{ true }}">
+                        <a href="{{ m.venueUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:oklch(0.82 0.03 220);text-decoration:none;border-bottom:1px dotted oklch(0.5 0.03 220);">{{ m.venue }}<span style="font-size:10px;">↗</span></a>
+                      </sc-if>
+                      <sc-if value="{{ m.venueMulti }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ m.toggleVenue }}" style="display:inline-flex;align-items:center;gap:4px;font-family:'Pretendard',sans-serif;font-size:12.5px;color:oklch(0.82 0.03 220);text-align:right;background:none;border:none;border-bottom:1px dotted oklch(0.5 0.03 220);padding:0;cursor:pointer;">{{ m.venue }}<span style="font-size:9px;">▼</span></button>
+                        <sc-if value="{{ m.venueOpen }}" hint-placeholder-val="{{ false }}">
+                          <div style="position:absolute;bottom:calc(100% + 8px);right:0;z-index:30;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:11px;padding:8px;box-shadow:0 10px 30px oklch(0.1 0.01 60 / 0.6);min-width:210px;display:flex;flex-direction:column;gap:4px;text-align:left;">
+                            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:oklch(0.55 0.01 70);text-transform:uppercase;padding:2px 6px 5px;">{{ t.mapLabel }}</div>
+                            <sc-for list="{{ m.venueChips }}" as="c" hint-placeholder-count="2">
+                              <a href="{{ c.url }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;color:oklch(0.9 0.005 80);background:oklch(0.25 0.012 60);border:1px solid oklch(0.32 0.01 60);border-radius:8px;padding:9px 12px;text-decoration:none;">{{ c.display }}<span>↗</span></a>
+                            </sc-for>
+                          </div>
+                        </sc-if>
+                      </sc-if>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <!-- RANK MODE TABLE -->
+    <sc-if value="{{ isPlainRank }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ venuePopoverOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closeVenue }}" style="position:fixed;inset:0;z-index:25;"></div></sc-if>
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+      <div style="border:1px solid oklch(0.28 0.01 60);border-radius:14px;overflow:visible;background:oklch(0.175 0.008 60);">
+        <div style="display:grid;grid-template-columns:66px minmax(260px,2fr) 128px 150px 190px 148px 92px;padding:14px 20px;background:oklch(0.21 0.01 60);border-bottom:1px solid oklch(0.3 0.01 60);border-radius:14px 14px 0 0;font-size:11.5px;font-weight:700;letter-spacing:0.06em;color:oklch(0.6 0.01 70);text-transform:uppercase;">
+          <div>{{ t.hRank }}</div><div>{{ t.hTitle }}</div><div>{{ t.hCat }}</div><div>{{ t.hVenue }}</div><div>{{ t.hTime }}</div><div style="position:relative;">
+            <button onClick="{{ toggleRatingPanel }}" style="font-family:'Pretendard',sans-serif;color:inherit;background:none;border:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:5px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;font-size:11.5px;">{{ t.ratingH }} <span style="{{ ratingCaretStyle }}">▼</span></button>
+            <sc-if value="{{ ratingPanelOpen }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ closeRating }}" style="position:fixed;inset:0;z-index:35;"></div>
+              <div style="position:absolute;top:calc(100% + 10px);right:0;z-index:40;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:12px;padding:13px;box-shadow:0 12px 34px oklch(0.1 0.01 60 / 0.6);width:298px;text-transform:none;letter-spacing:0;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+                  <div style="font-size:11.5px;font-weight:600;color:oklch(0.62 0.01 70);">{{ t.ratingHint }}</div>
+                  <button onClick="{{ toggleAllRatings }}" style="font-family:'Pretendard',sans-serif;font-size:11.5px;font-weight:600;color:oklch(0.8 0.03 55);background:oklch(0.25 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:7px;padding:5px 10px;cursor:pointer;white-space:nowrap;" style-hover="border-color:oklch(0.5 0.01 60);">{{ toggleAllLabel }}</button>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  <sc-for list="{{ ratingChips }}" as="c" hint-placeholder-count="6">
+                    <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }} <span style="opacity:0.65;font-weight:400;">{{ c.count }}</span></button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div><div style="text-align:right;">{{ t.link }}</div>
+        </div>
+        <sc-for list="{{ rankRows }}" as="m" hint-placeholder-count="12">
+          <div style="display:grid;grid-template-columns:66px minmax(260px,2fr) 128px 150px 190px 148px 92px;align-items:center;padding:15px 20px;border-bottom:1px solid oklch(0.24 0.008 60);{{ m.dimStyle }}" style-hover="background:oklch(0.2 0.01 60);">
+            <div style="position:relative;">
+              <sc-if value="{{ activeIsBase }}" hint-placeholder-val="{{ true }}"><span style="{{ m.rankStyle }}">{{ m.rankLabel }}</span></sc-if>
+              <sc-if value="{{ activeIsCustom }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ m.toggleEdit }}" style="{{ m.rankTriggerStyle }}">{{ m.rankLabel }}</button>
+                <sc-if value="{{ m.editOpen }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ closeEdit }}" style="position:fixed;inset:0;z-index:45;"></div>
+                  <div style="position:absolute;top:calc(100% + 8px);left:0;z-index:50;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:12px;padding:12px;box-shadow:0 14px 36px oklch(0.1 0.01 60 / 0.65);width:270px;">
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;">
+                      <sc-for list="{{ m.tierBtns }}" as="tb" hint-placeholder-count="7"><button onClick="{{ tb.onClick }}" style="{{ tb.style }}">{{ tb.label }}</button></sc-for>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                      <button onClick="{{ m.outBtn.onClick }}" style="{{ m.outBtn.style }}">{{ t.newBadge }}</button>
+                      <button onClick="{{ m.onClear }}" style="font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;background:transparent;color:oklch(0.6 0.01 70);border:1px solid oklch(0.3 0.01 60);">{{ t.clearTxt }}</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </sc-if>
+            </div>
+            <div style="padding-right:18px;min-width:0;">
+              <div style="font-size:15.5px;font-weight:600;letter-spacing:-0.01em;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">{{ m.ko }}<sc-if value="{{ m.isNew }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:oklch(0.7 0.008 70);background:oklch(0.28 0.006 60);border:1px dashed oklch(0.42 0.01 60);border-radius:5px;padding:2px 7px;letter-spacing:0.02em;">{{ t.newBadge }}</span></sc-if></div>
+              <div style="font-size:12.5px;color:oklch(0.58 0.01 70);margin-top:3px;line-height:1.3;">{{ m.en }}</div>
+            </div>
+            <div><span style="display:inline-block;font-size:11.5px;font-weight:600;color:oklch(0.8 0.03 55);background:oklch(0.25 0.02 55);border:1px solid oklch(0.34 0.03 55);padding:4px 9px;border-radius:20px;line-height:1.2;">{{ m.category }}</span></div>
+            <div style="position:relative;padding-right:12px;">
+              <sc-if value="{{ m.venueSingle }}" hint-placeholder-val="{{ true }}">
+                <a href="{{ m.venueUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:13px;color:oklch(0.82 0.03 220);line-height:1.4;text-decoration:none;border-bottom:1px dotted oklch(0.5 0.03 220);cursor:pointer;" style-hover="color:oklch(0.9 0.05 220);">{{ m.venue }}<span style="font-size:11px;">↗</span></a>
+              </sc-if>
+              <sc-if value="{{ m.venueMulti }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ m.toggleVenue }}" style="display:inline-flex;align-items:center;gap:4px;font-family:'Pretendard',sans-serif;font-size:13px;color:oklch(0.82 0.03 220);line-height:1.4;text-align:left;background:none;border:none;border-bottom:1px dotted oklch(0.5 0.03 220);padding:0;cursor:pointer;">{{ m.venue }}<span style="font-size:9px;">▼</span></button>
+                <sc-if value="{{ m.venueOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;bottom:calc(100% + 8px);left:0;z-index:30;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:11px;padding:8px;box-shadow:0 10px 30px oklch(0.1 0.01 60 / 0.6);min-width:210px;display:flex;flex-direction:column;gap:4px;">
+                    <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:oklch(0.55 0.01 70);text-transform:uppercase;padding:2px 6px 5px;">{{ t.mapLabel }}</div>
+                    <sc-for list="{{ m.venueChips }}" as="c" hint-placeholder-count="2">
+                      <a href="{{ c.url }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;color:oklch(0.9 0.005 80);background:oklch(0.25 0.012 60);border:1px solid oklch(0.32 0.01 60);border-radius:8px;padding:9px 12px;text-decoration:none;" style-hover="background:oklch(0.63 0.21 25);border-color:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);">{{ c.display }}<span>↗</span></a>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </sc-if>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:oklch(0.85 0.01 80);line-height:1.55;padding-right:12px;">{{ m.showtime }}</div>
+            <div style="font-size:12.5px;color:oklch(0.68 0.01 70);line-height:1.4;padding-right:12px;">{{ m.rating }}</div>
+            <div style="text-align:right;">
+              <sc-if value="{{ m.hasLink }}" hint-placeholder-val="{{ true }}"><a href="{{ m.link }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:oklch(0.15 0.008 60);background:oklch(0.63 0.21 25);padding:8px 13px;border-radius:8px;text-decoration:none;" style-hover="background:oklch(0.68 0.21 25);">{{ t.view }} ↗</a></sc-if>
+              <sc-if value="{{ m.noLink }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:oklch(0.44 0.008 70);">–</span></sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- MOBILE RANK CARDS -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;position:relative;">
+          <button onClick="{{ toggleRatingPanel }}" style="display:inline-flex;align-items:center;gap:6px;font-family:'Pretendard',sans-serif;font-size:13px;font-weight:600;color:oklch(0.86 0.01 70);background:oklch(0.2 0.01 60);border:1px solid oklch(0.3 0.01 60);border-radius:9px;padding:8px 13px;cursor:pointer;">{{ t.ratingH }} <span style="{{ ratingCaretStyle }}">▼</span></button>
+          <sc-if value="{{ ratingPanelOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeRating }}" style="position:fixed;inset:0;z-index:35;"></div>
+            <div style="position:absolute;top:calc(100% + 8px);right:0;z-index:40;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:12px;padding:13px;box-shadow:0 12px 34px oklch(0.1 0.01 60 / 0.6);width:min(300px,calc(100vw - 56px));">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+                <div style="font-size:11.5px;font-weight:600;color:oklch(0.62 0.01 70);">{{ t.ratingHint }}</div>
+                <button onClick="{{ toggleAllRatings }}" style="font-family:'Pretendard',sans-serif;font-size:11.5px;font-weight:600;color:oklch(0.8 0.03 55);background:oklch(0.25 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:7px;padding:5px 10px;cursor:pointer;white-space:nowrap;">{{ toggleAllLabel }}</button>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <sc-for list="{{ ratingChips }}" as="c" hint-placeholder-count="6">
+                  <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }} <span style="opacity:0.65;font-weight:400;">{{ c.count }}</span></button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ rankRows }}" as="m" hint-placeholder-count="8">
+            <div style="border:1px solid oklch(0.28 0.01 60);border-radius:13px;background:oklch(0.185 0.008 60);padding:14px;{{ m.dimStyle }}">
+              <div style="display:flex;align-items:flex-start;gap:11px;">
+                <div style="position:relative;flex:none;">
+                  <sc-if value="{{ activeIsBase }}" hint-placeholder-val="{{ true }}"><span style="{{ m.rankStyle }}">{{ m.rankLabel }}</span></sc-if>
+                  <sc-if value="{{ activeIsCustom }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ m.toggleEdit }}" style="{{ m.rankTriggerStyle }}">{{ m.rankLabel }}</button>
+                    <sc-if value="{{ m.editOpen }}" hint-placeholder-val="{{ false }}">
+                      <div onClick="{{ closeEdit }}" style="position:fixed;inset:0;z-index:45;"></div>
+                      <div style="position:absolute;top:calc(100% + 8px);left:0;z-index:50;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:12px;padding:12px;box-shadow:0 14px 36px oklch(0.1 0.01 60 / 0.65);width:min(270px,calc(100vw - 60px));">
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;">
+                          <sc-for list="{{ m.tierBtns }}" as="tb" hint-placeholder-count="7"><button onClick="{{ tb.onClick }}" style="{{ tb.style }}">{{ tb.label }}</button></sc-for>
+                        </div>
+                        <div style="display:flex;gap:6px;">
+                          <button onClick="{{ m.outBtn.onClick }}" style="{{ m.outBtn.style }}">{{ t.newBadge }}</button>
+                          <button onClick="{{ m.onClear }}" style="font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;background:transparent;color:oklch(0.6 0.01 70);border:1px solid oklch(0.3 0.01 60);">{{ t.clearTxt }}</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </sc-if>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:16px;font-weight:700;letter-spacing:-0.01em;line-height:1.3;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">{{ m.ko }}<sc-if value="{{ m.isNew }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;color:oklch(0.7 0.008 70);background:oklch(0.28 0.006 60);border:1px dashed oklch(0.42 0.01 60);border-radius:5px;padding:2px 6px;">{{ t.newBadge }}</span></sc-if></div>
+                  <div style="font-size:12.5px;color:oklch(0.58 0.01 70);margin-top:3px;line-height:1.3;">{{ m.en }}</div>
+                </div>
+                <sc-if value="{{ m.hasLink }}" hint-placeholder-val="{{ true }}"><a href="{{ m.link }}" target="_blank" rel="noopener" style="flex:none;display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;color:oklch(0.15 0.008 60);background:oklch(0.63 0.21 25);padding:8px 12px;border-radius:8px;text-decoration:none;">{{ t.view }} ↗</a></sc-if>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;">
+                <span style="display:inline-block;font-size:11.5px;font-weight:600;color:oklch(0.8 0.03 55);background:oklch(0.25 0.02 55);border:1px solid oklch(0.34 0.03 55);padding:4px 9px;border-radius:20px;line-height:1.2;">{{ m.category }}</span>
+                <span style="font-size:12px;color:oklch(0.68 0.01 70);">{{ m.rating }}</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding-top:11px;border-top:1px solid oklch(0.26 0.008 60);">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:oklch(0.82 0.01 80);line-height:1.5;flex:1;min-width:0;">{{ m.showtime }}</div>
+                <div style="position:relative;flex:none;text-align:right;">
+                  <sc-if value="{{ m.venueSingle }}" hint-placeholder-val="{{ true }}">
+                    <a href="{{ m.venueUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:oklch(0.82 0.03 220);text-decoration:none;border-bottom:1px dotted oklch(0.5 0.03 220);">{{ m.venue }}<span style="font-size:10px;">↗</span></a>
+                  </sc-if>
+                  <sc-if value="{{ m.venueMulti }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ m.toggleVenue }}" style="display:inline-flex;align-items:center;gap:4px;font-family:'Pretendard',sans-serif;font-size:12.5px;color:oklch(0.82 0.03 220);text-align:right;background:none;border:none;border-bottom:1px dotted oklch(0.5 0.03 220);padding:0;cursor:pointer;">{{ m.venue }}<span style="font-size:9px;">▼</span></button>
+                    <sc-if value="{{ m.venueOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;bottom:calc(100% + 8px);right:0;z-index:30;background:oklch(0.2 0.012 60);border:1px solid oklch(0.34 0.01 60);border-radius:11px;padding:8px;box-shadow:0 10px 30px oklch(0.1 0.01 60 / 0.6);min-width:210px;display:flex;flex-direction:column;gap:4px;text-align:left;">
+                        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:oklch(0.55 0.01 70);text-transform:uppercase;padding:2px 6px 5px;">{{ t.mapLabel }}</div>
+                        <sc-for list="{{ m.venueChips }}" as="c" hint-placeholder-count="2">
+                          <a href="{{ c.url }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;color:oklch(0.9 0.005 80);background:oklch(0.25 0.012 60);border:1px solid oklch(0.32 0.01 60);border-radius:8px;padding:9px 12px;text-decoration:none;">{{ c.display }}<span>↗</span></a>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- TIME MODE TABLE -->
+    <sc-if value="{{ isTime }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:0 2px 18px;color:oklch(0.6 0.01 70);font-size:12.5px;">
+        <span style="display:flex;align-items:center;gap:7px;"><span style="display:inline-block;width:18px;height:12px;background:oklch(0.225 0.014 60);border:1px solid oklch(0.3 0.01 60);border-left:3px solid oklch(0.63 0.21 25);border-radius:3px;"></span><sc-if value="{{ isKo }}" hint-placeholder-val="{{ true }}">상영 블록 (세로 길이 = 러닝타임)</sc-if><sc-if value="{{ isJa }}" hint-placeholder-val="{{ false }}">上映ブロック（縦の長さ = 上映時間）</sc-if></span>
+        <span>·</span>
+        <sc-if value="{{ isKo }}" hint-placeholder-val="{{ true }}"><span>같은 시간대에 <b style="color:oklch(0.82 0.02 70);">나란히 놓인 블록</b>은 시간이 겹쳐 함께 볼 수 없습니다</span></sc-if>
+        <sc-if value="{{ isJa }}" hint-placeholder-val="{{ false }}"><span>同じ時間帯に <b style="color:oklch(0.82 0.02 70);">横並びのブロック</b> は時間が重なり一緒に観られません</span></sc-if>
+        <span>·</span>
+        <sc-if value="{{ isKo }}" hint-placeholder-val="{{ true }}"><span>블록 클릭 시 소개 페이지로 이동</span></sc-if>
+        <sc-if value="{{ isJa }}" hint-placeholder-val="{{ false }}"><span>ブロックをクリックすると紹介ページへ移動</span></sc-if>
+        <span>·</span>
+        <span style="display:flex;align-items:center;gap:7px;"><span style="display:inline-block;width:18px;height:12px;background:repeating-linear-gradient(135deg,oklch(0.2 0.006 60),oklch(0.2 0.006 60) 4px,oklch(0.185 0.005 60) 4px,oklch(0.185 0.005 60) 8px);border:1px dashed oklch(0.36 0.01 60);border-left:3px solid oklch(0.44 0.02 60);border-radius:3px;"></span>{{ t.legendOut }}</span>
+      </div>
+
+      <sc-for list="{{ timetableDays }}" as="day" hint-placeholder-count="1">
+        <div style="margin-bottom:30px;">
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding-bottom:9px;border-bottom:2px solid oklch(0.3 0.01 60);">
+            <span style="font-size:19px;font-weight:800;letter-spacing:-0.01em;">{{ day.label }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:oklch(0.6 0.01 70);">{{ day.count }}{{ t.screenings }}</span>
+          </div>
+          <div style="{{ day.scrollStyle }}">
+          <div style="{{ day.rowStyle }}">
+            <div style="{{ day.gutterStyle }}">
+              <sc-for list="{{ day.hourLabels }}" as="h" hint-placeholder-count="8">
+                <div style="{{ h.style }}">{{ h.text }}</div>
+              </sc-for>
+            </div>
+            <div style="{{ day.trackStyle }}">
+              <sc-for list="{{ day.gridLines }}" as="g" hint-placeholder-count="8">
+                <div style="{{ g.style }}"></div>
+              </sc-for>
+              <sc-for list="{{ day.blocks }}" as="b" hint-placeholder-count="10">
+                <sc-if value="{{ b.hasLink }}" hint-placeholder-val="{{ true }}">
+                  <a href="{{ b.link }}" target="_blank" rel="noopener" style="{{ b.blockStyle }}" style-hover="filter:brightness(1.18);border-color:oklch(0.5 0.01 60);z-index:5;">
+                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;">
+                      <span style="{{ b.rankMini }}">{{ b.rankLabel }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:{{ b.rangeColor }};white-space:nowrap;">{{ b.rangeLabel }}</span>
+                    </div>
+                    <div style="font-size:13px;font-weight:700;line-height:1.25;letter-spacing:-0.01em;">{{ b.ko }}</div>
+                    <div style="font-size:11px;color:oklch(0.6 0.01 70);margin-top:2px;line-height:1.25;">{{ b.venue }}</div>
+                    <sc-if value="{{ b.unknown }}" hint-placeholder-val="{{ false }}"><div style="font-size:10px;color:oklch(0.55 0.01 70);margin-top:2px;">{{ t.unknownRt }}</div></sc-if>
+                  </a>
+                </sc-if>
+                <sc-if value="{{ b.noLink }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ b.blockStyle }}">
+                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;">
+                      <span style="{{ b.rankMini }}">{{ b.rankLabel }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:{{ b.rangeColor }};white-space:nowrap;">{{ b.rangeLabel }}</span>
+                    </div>
+                    <div style="font-size:13px;font-weight:700;line-height:1.25;letter-spacing:-0.01em;">{{ b.ko }}</div>
+                    <div style="font-size:11px;color:oklch(0.6 0.01 70);margin-top:2px;line-height:1.25;">{{ b.venue }}</div>
+                    <sc-if value="{{ b.unknown }}" hint-placeholder-val="{{ false }}"><div style="font-size:10px;color:oklch(0.55 0.01 70);margin-top:2px;">{{ t.unknownRt }}</div></sc-if>
+                  </div>
+                </sc-if>
+              </sc-for>
+            </div>
+          </div>
+          </div>
+        </div>
+      </sc-for>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { movies: [], mode: 'rank', query: '', day: 'all', venueMode: false, venue: 'all', openVenue: null, ratingOff: [], ratingPanelOpen: false, lang: 'ja', editMovie: null, activeId: 'main', profiles: [], nameEditId: null, nameEditVal: '', confirmDel: false, vw: (typeof window !== 'undefined' ? window.innerWidth : 1280) };
+
+  SB_URL = 'https://sgityiyhrhluvsuwtmwx.supabase.co';
+  SB_KEY = 'sb_publishable_Mgf_ect4z8_c2ntBcztpVA_sxJm_fIi';
+  SB_TABLE = 'profiles';
+
+  componentWillUnmount() { if (this._onResize) window.removeEventListener('resize', this._onResize); }
+
+  async componentDidMount() {
+    this._onResize = () => { if ((window.innerWidth <= 640) !== (this.state.vw <= 640)) this.setState({ vw: window.innerWidth }); };
+    window.addEventListener('resize', this._onResize);
+    try {
+      const raw = localStorage.getItem('bifan_profiles_v1');
+      if (raw) { const d = JSON.parse(raw); let aid = 'main'; try { aid = localStorage.getItem('bifan_active_v1') || 'main'; } catch (_) {} this.setState({ profiles: d.profiles || [], activeId: aid }); }
+    } catch (e) {}
+    this.loadProfiles();
+    try {
+      const dataUrl = (window.__resources && window.__resources.moviesData) || './data/movies.js';
+      const mod = await import(dataUrl);
+      this.setState({ movies: mod.default || [] });
+    } catch (e) {
+      console.error('movie load failed', e);
+    }
+  }
+
+  persistProfiles(profiles, activeId) {
+    try { localStorage.setItem('bifan_profiles_v1', JSON.stringify({ profiles, activeId })); localStorage.setItem('bifan_active_v1', activeId); } catch (e) {}
+  }
+  sbHeaders(extra) { return Object.assign({ apikey: this.SB_KEY, Authorization: 'Bearer ' + this.SB_KEY, 'Content-Type': 'application/json' }, extra || {}); }
+  async sbUpsert(p) {
+    if (!p) return;
+    try {
+      await fetch(this.SB_URL + '/rest/v1/' + this.SB_TABLE, {
+        method: 'POST',
+        headers: this.sbHeaders({ Prefer: 'resolution=merge-duplicates,return=minimal' }),
+        body: JSON.stringify({ id: p.id, name: p.name, ranks: p.ranks || {}, cant_watch: p.cantWatch || {}, updated_at: new Date().toISOString() })
+      });
+    } catch (e) { console.warn('sb upsert failed', e); }
+  }
+  queueUpsert(p) {
+    if (!p) return;
+    this._upQ = this._upQ || {};
+    this._upQ[p.id] = p;
+    clearTimeout(this._upT);
+    this._upT = setTimeout(() => { const q = this._upQ; this._upQ = {}; Object.values(q).forEach(x => this.sbUpsert(x)); }, 700);
+  }
+  async sbDelete(id) {
+    try {
+      await fetch(this.SB_URL + '/rest/v1/' + this.SB_TABLE + '?id=eq.' + encodeURIComponent(id), { method: 'DELETE', headers: this.sbHeaders() });
+    } catch (e) { console.warn('sb delete failed', e); }
+  }
+  async loadProfiles() {
+    let activeId = 'main';
+    try { activeId = localStorage.getItem('bifan_active_v1') || 'main'; } catch (e) {}
+    let profiles = [];
+    try {
+      const r = await fetch(this.SB_URL + '/rest/v1/' + this.SB_TABLE + '?select=*', { headers: this.sbHeaders() });
+      if (!r.ok) throw new Error('status ' + r.status);
+      const rows = await r.json();
+      profiles = rows.map(row => ({ id: row.id, name: row.name, ranks: row.ranks || {}, cantWatch: row.cant_watch || {} }));
+      try {
+        const raw = localStorage.getItem('bifan_profiles_v1');
+        if (raw && !localStorage.getItem('bifan_migrated_v1')) {
+          const d = JSON.parse(raw); const local = d.profiles || [];
+          const have = new Set(profiles.map(p => p.id));
+          for (const p of local) {
+            if (!have.has(p.id)) { await this.sbUpsert(p); profiles.push({ id: p.id, name: p.name, ranks: p.ranks || {}, cantWatch: p.cantWatch || {} }); }
+          }
+          localStorage.setItem('bifan_migrated_v1', '1');
+        }
+      } catch (e) { console.warn('migration failed', e); }
+    } catch (e) {
+      console.warn('supabase load failed, using local cache', e);
+      try { const raw = localStorage.getItem('bifan_profiles_v1'); if (raw) { const d = JSON.parse(raw); profiles = d.profiles || []; } } catch (_) {}
+    }
+    if (activeId !== 'base' && activeId !== 'main' && !profiles.find(p => p.id === activeId)) activeId = 'main';
+    this.setState({ profiles, activeId });
+  }
+  getActiveProfile() { return (this.state.activeId === 'base' || this.state.activeId === 'main') ? null : (this.state.profiles.find(p => p.id === this.state.activeId) || null); }
+  scrollToCat(id) {
+    try {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let sc = el.parentElement;
+      while (sc && sc !== document.body) {
+        const oy = getComputedStyle(sc).overflowY;
+        if ((oy === 'auto' || oy === 'scroll') && sc.scrollHeight > sc.clientHeight + 4) break;
+        sc = sc.parentElement;
+      }
+      if (sc && sc !== document.body) {
+        const top = el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 16;
+        sc.scrollTo({ top, behavior: 'smooth' });
+      } else {
+        const top = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop || 0) - 76;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    } catch (e) {}
+  }
+  baseLetter(r) { return ({ '1':'S','2':'A','3':'B','4':'C','5':'D','6':'E' })[r] || ''; }
+  letterOrder(L) { const o = { S:0, A:1, B:2, C:3, D:4, E:5, F:6 }; return (L in o) ? o[L] : 99; }
+  rankLetterOf(film) { const p = this.getActiveProfile(); return p ? (p.ranks[film.id] || '') : this.baseLetter(film.rank); }
+  isFilmOut(film) { if (this.state.activeId === 'main') return false; const p = this.getActiveProfile(); return p ? !!p.cantWatch[film.id] : !!film.isNew; }
+  occIsOut(occ, film) { if (this.state.activeId === 'main') return false; const p = this.getActiveProfile(); return p ? !!p.cantWatch[film.id] : !!occ.outWindow; }
+  venueChipsOf(m) {
+    const occ = m.occ || [];
+    if (!occ.length) return (m.venueChips || []).map(c => ({ ...c }));
+    const groups = []; const idx = {};
+    occ.forEach(o => {
+      const key = o.venueHall + '|' + o.building;
+      if (!(key in idx)) { idx[key] = groups.length; groups.push({ hall: o.venueHall, building: o.building, url: o.venueUrl, occ: [] }); }
+      groups[idx[key]].occ.push(o);
+    });
+    const single = occ.length === 1;
+    return groups.map(g => {
+      let suffix = '';
+      if (!single) {
+        const days = [];
+        g.occ.forEach(o => { const d = String(o.dateLabel || '').replace(/\(.*?\)/, ''); if (!days.includes(d)) days.push(d); });
+        if (days.length === 1 && g.occ.length > 1) suffix = ' (' + g.occ.map(o => o.timeLabel).join(', ') + ')';
+        else suffix = ' (' + days.join(', ') + ')';
+      }
+      return { hall: g.hall, building: g.building, url: g.url, display: g.hall + suffix };
+    });
+  }
+
+  startAddProfile() { this.setState({ nameEditId: 'new', nameEditVal: '', confirmDel: false }); }
+  startRenameProfile() { const p = this.getActiveProfile(); if (!p) return; this.setState({ nameEditId: p.id, nameEditVal: p.name, confirmDel: false }); }
+  changeNameVal(v) { this.setState({ nameEditVal: v }); }
+  cancelNameEdit() { this.setState({ nameEditId: null }); }
+  commitNameEdit() {
+    const id = this.state.nameEditId; const name = (this.state.nameEditVal || '').trim();
+    if (id === 'new') {
+      const finalName = name || ('프로필 ' + (this.state.profiles.length + 1));
+      const pid = 'p' + Date.now();
+      const profiles = [...this.state.profiles, { id: pid, name: finalName, ranks: {}, cantWatch: {} }];
+      this.setState({ profiles, activeId: pid, nameEditId: null, editMovie: null });
+      this.persistProfiles(profiles, pid);
+      this.sbUpsert({ id: pid, name: finalName, ranks: {}, cantWatch: {} });
+    } else if (id) {
+      if (!name) { this.setState({ nameEditId: null }); return; }
+      const profiles = this.state.profiles.map(p => p.id === id ? { ...p, name } : p);
+      this.setState({ profiles, nameEditId: null }); this.persistProfiles(profiles, this.state.activeId);
+      this.sbUpsert(profiles.find(p => p.id === id));
+    }
+  }
+  requestDelete() { this.setState({ confirmDel: true }); }
+  cancelDelete() { this.setState({ confirmDel: false }); }
+  confirmDeleteProfile() {
+    const id = this.state.activeId; if (id === 'base') return;
+    const profiles = this.state.profiles.filter(p => p.id !== id);
+    this.setState({ profiles, activeId: 'base', confirmDel: false, editMovie: null, nameEditId: null });
+    this.persistProfiles(profiles, 'base');
+    this.sbDelete(id);
+  }
+  setActiveProfile(id) { this.setState({ activeId: id, editMovie: null, nameEditId: null, confirmDel: false }); this.persistProfiles(this.state.profiles, id); }
+  updateActive(mutator) {
+    const id = this.state.activeId; if (id === 'base') return;
+    const profiles = this.state.profiles.map(p => { if (p.id !== id) return p; const np = { ...p, ranks: { ...p.ranks }, cantWatch: { ...p.cantWatch } }; mutator(np); return np; });
+    this.setState({ profiles }); this.persistProfiles(profiles, id);
+    this.queueUpsert(profiles.find(p => p.id === id));
+  }
+  setFilmRank(movieId, letter) { this.updateActive(p => { if (p.ranks[movieId] === letter) delete p.ranks[movieId]; else p.ranks[movieId] = letter; delete p.cantWatch[movieId]; }); }
+  toggleFilmOut(movieId) { this.updateActive(p => { if (p.cantWatch[movieId]) delete p.cantWatch[movieId]; else { p.cantWatch[movieId] = true; delete p.ranks[movieId]; } }); }
+  clearFilm(movieId) { this.updateActive(p => { delete p.ranks[movieId]; delete p.cantWatch[movieId]; }); }
+
+  rankLabel(r) { return ({ '1':'S','2':'A','3':'B','4':'C','5':'D','6':'E' })[r] || '–'; }
+  rankOrder(r) { const o = { '1':0,'2':1,'3':2,'4':3,'5':4,'6':5 }; return (r in o) ? o[r] : 99; }
+  rankStyle(label) {
+    const base = "display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;";
+    const tiers = {
+      S: 'background:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);',
+      A: 'background:oklch(0.66 0.16 33);color:oklch(0.15 0.008 60);',
+      B: 'background:oklch(0.7 0.115 45);color:oklch(0.15 0.008 60);',
+      C: 'background:oklch(0.55 0.07 55);color:oklch(0.95 0.01 80);',
+      D: 'background:oklch(0.42 0.045 60);color:oklch(0.9 0.01 80);',
+      E: 'background:oklch(0.33 0.025 60);color:oklch(0.82 0.01 80);',
+      F: 'background:oklch(0.27 0.015 60);color:oklch(0.6 0.01 80);'
+    };
+    return base + (tiers[label] || 'background:transparent;border:1px solid oklch(0.32 0.01 60);color:oklch(0.5 0.01 70);');
+  }
+
+  matchQuery(m, q) {
+    if (!q) return true;
+    return (m.ko + ' ' + m.en + ' ' + m.category + ' ' + m.venue).toLowerCase().includes(q);
+  }
+
+  buildTimetable(base, day, buildingFilter, L) {
+    const PPM = 1.7;           // pixels per minute
+    const NOMINAL = 90;        // assumed runtime (min) when unknown
+    const MINH = 46;           // minimum block height
+    const DAYS = [
+      ['fri', '금', '7/3'], ['sat', '토', '7/4'], ['sun', '일', '7/5'],
+      ['mon', '월', '7/6'], ['tue', '화', '7/7']
+    ];
+    const tierAccent = {
+      S: 'oklch(0.63 0.21 25)', A: 'oklch(0.66 0.16 33)', B: 'oklch(0.7 0.115 45)',
+      C: 'oklch(0.5 0.05 60)', D: 'oklch(0.42 0.03 60)', E: 'oklch(0.36 0.02 60)', F: 'oklch(0.3 0.015 60)'
+    };
+    const wanted = DAYS.filter(([code]) => day === 'all' || day === code);
+
+    return wanted.map(([code, dow, date]) => {
+      // collect screenings on this day
+      const scr = [];
+      base.forEach(m => m.occ.forEach(o => {
+        if (o.day !== code) return;
+        if (buildingFilter && o.building !== buildingFilter) return;
+        const start = o.h * 60 + o.mi;
+        const rt = m.runtime || NOMINAL;
+        scr.push({ m, o, start, rt, end: start + rt, unknown: !m.runtime, out: L.occOut(o, m) });
+      }));
+      if (!scr.length) return null;
+      scr.sort((a, b) => a.start - b.start || a.end - b.end);
+
+      // overlap clusters -> lane packing (interval partitioning)
+      let cur = null, maxEnd = -1;
+      const clusters = [];
+      scr.forEach(s => {
+        if (cur && s.start < maxEnd) { cur.push(s); maxEnd = Math.max(maxEnd, s.end); }
+        else { cur = [s]; clusters.push(cur); maxEnd = s.end; }
+      });
+      clusters.forEach(cl => {
+        const lanes = [];
+        cl.forEach(s => {
+          let li = lanes.findIndex(e => e <= s.start);
+          if (li < 0) { li = lanes.length; lanes.push(s.end); } else lanes[li] = s.end;
+          s.lane = li;
+        });
+        cl.forEach(s => { s.lanes = lanes.length; });
+      });
+
+      const minStart = Math.min(...scr.map(s => s.start));
+      const maxEndAll = Math.max(...scr.map(s => s.end));
+      const startHour = Math.floor(minStart / 60);
+      const endHour = Math.ceil(maxEndAll / 60);
+      const axisHeight = (endHour - startHour) * 60 * PPM;
+      const trackStyle = 'position:relative;flex:1;min-width:0;height:' + axisHeight + 'px;';
+      const gutterStyle = 'position:relative;flex:none;width:52px;height:' + axisHeight + 'px;';
+
+      const hourLabels = [], gridLines = [];
+      for (let h = startHour; h <= endHour; h++) {
+        const top = (h - startHour) * 60 * PPM;
+        hourLabels.push({ text: (h < 10 ? '0' + h : h) + ':00',
+          style: 'position:absolute;right:8px;top:' + (top - 7) + 'px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:oklch(0.5 0.01 70);' });
+        gridLines.push({ style: 'position:absolute;left:0;right:0;top:' + top + 'px;border-top:1px solid oklch(0.235 0.008 60);' });
+      }
+
+      const blocks = scr.map(s => {
+        const top = (s.start - startHour * 60) * PPM;
+        const height = Math.max(s.rt * PPM, MINH);
+        const wPct = 100 / s.lanes;
+        const leftPct = s.lane * wPct;
+        const accent = tierAccent[L.rankOf(s.m)] || 'oklch(0.34 0.01 60)';
+        const out = s.out;
+        const blockStyle =
+          'position:absolute;box-sizing:border-box;top:' + top + 'px;height:' + (height - 4) + 'px;' +
+          'left:calc(' + leftPct + '% + 2px);width:calc(' + wPct + '% - 6px);' +
+          'padding:7px 9px;border-radius:8px;overflow:hidden;' +
+          (out
+            ? 'background:repeating-linear-gradient(135deg,oklch(0.2 0.006 60),oklch(0.2 0.006 60) 7px,oklch(0.185 0.005 60) 7px,oklch(0.185 0.005 60) 14px);border:1px dashed oklch(0.36 0.01 60);border-left:3px solid oklch(0.44 0.02 60);color:oklch(0.62 0.008 70);'
+            : 'background:oklch(0.225 0.014 60);border:1px solid oklch(0.3 0.01 60);border-left:3px solid ' + accent + ';color:oklch(0.92 0.005 80);') +
+          'text-decoration:none;cursor:' + (s.m.hasLink ? 'pointer' : 'default') + ';display:block;';
+        const rankLabel = L.rankOf(s.m) || '–';
+        return {
+          id: s.m.id + '-' + s.o.sortTime,
+          ko: L.big(s.m), venue: L.hallStr(s.m.venue), rating: s.m.rating,
+          rangeLabel: s.o.timeRange,
+          rankLabel,
+          rankMini: 'display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 3px;border-radius:4px;font-family:\'JetBrains Mono\',monospace;font-weight:700;font-size:10.5px;' +
+            (tierAccent[rankLabel] ? 'background:' + tierAccent[rankLabel] + ';color:oklch(0.15 0.008 60);' : 'background:transparent;border:1px solid oklch(0.34 0.01 60);color:oklch(0.55 0.01 70);'),
+          hasLink: s.m.hasLink, noLink: !s.m.hasLink, link: L.link(s.m.link),
+          unknown: s.unknown, out,
+          rangeColor: out ? 'oklch(0.6 0.02 50)' : 'oklch(0.78 0.13 40)',
+          blockStyle
+        };
+      });
+
+      return { key: code, label: L.dowChar(dow) + ' · ' + date, count: scr.length,
+        scrollStyle: L.isMobile ? 'overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;' : '',
+        rowStyle: L.isMobile ? 'display:flex;gap:6px;min-width:560px;' : 'display:flex;gap:6px;',
+        gutterStyle, trackStyle, hourLabels, gridLines, blocks };
+    }).filter(Boolean);
+  }
+
+  renderVals() {
+    const q = this.state.query.trim().toLowerCase();
+    const mode = this.state.mode;
+    const day = this.state.day;
+    const venueMode = this.state.venueMode;
+    const venue = this.state.venue;
+    const ratingOff = this.state.ratingOff;
+    const qbase = this.state.movies.filter(m => this.matchQuery(m, q));
+    const base = qbase.filter(m => m.ratingTokens.some(t => !ratingOff.includes(t)));
+
+    // ---- language layer ----
+    const JA = this.state.lang === 'ja';
+    const isMobile = this.state.vw <= 640;
+    const CAT_JA = {
+      'AI 프론티어':'AIフロンティア','B 익스트림':'Bエクストリーム','개막작':'オープニング作品',
+      '부천 초이스 AI영화':'プチョン・チョイス AI映画','부천 초이스 월드':'プチョン・チョイス：ワールド',
+      '부천 초이스 코리안':'プチョン・チョイス：コリアン','스트레인지 오마쥬':'ストレンジ・オマージュ',
+      '시그니처':'シグネチャー','심야상영':'深夜上映','아시아 장르영화99':'アジアジャンル映画99',
+      '찾아가는 동네 영화관':'訪ねる街の映画館','판타스케이프':'ファンタスケープ',
+      '판타스틱 쇼츠':'ファンタスティック・ショーツ','환상영화학교':'幻想映画学校'
+    };
+    const HALL_JA = {
+      '판타스틱큐브':'ファンタスティックキューブ','CGV소풍5관':'CGVソプン5館','CGV소풍8관':'CGVソプン8館',
+      'CGV소풍10관':'CGVソプン10館','CGV소풍4관':'CGVソプン4館','CGV소풍9관':'CGVソプン9館',
+      'CGV소풍6관':'CGVソプン6館','한국만화박물관':'韓国漫画博物館','어울마당':'オウルマダン',
+      '메가박스1관':'メガボックス1館','메가박스2관':'メガボックス2館','메가박스3관':'メガボックス3館',
+      '메가박스 부천스타필드시티 1관':'メガボックス富川スターフィールドシティ1館',
+      '솔안아트홀':'ソラン・アートホール','현대백화점 하늘정원':'現代百貨店 空の庭園',
+      '오정아트홀':'梧亭アートホール','부천시청 잔디광장':'富川市庁 芝生広場',
+      '힐스테이트 소사역 갤러리':'ヒルステート素砂駅ギャラリー'
+    };
+    const BLDG_JA = {
+      '한국만화박물관':'韓国漫画博物館','CGV소풍':'CGVソプン','메가박스 부천스타필드시티':'メガボックス富川スターフィールドシティ',
+      '솔안아트홀':'ソラン・アートホール','현대백화점 중동점 하늘정원':'現代百貨店 中洞店 空の庭園',
+      '오정아트홀':'梧亭アートホール','부천시청':'富川市庁','힐스테이트 소사역 달스퀘어 갤러리':'ヒルステート素砂駅 タルスクエア・ギャラリー'
+    };
+    const DOW_JA = { '토':'土','일':'日','월':'月','화':'火' };
+    const hallStr = (s) => { if (!JA || !s) return s; let r = s; Object.keys(HALL_JA).forEach(k => { r = r.split(k).join(HALL_JA[k]); }); return r; };
+    const L = {
+      JA, isMobile,
+      rankOf: (film) => this.rankLetterOf(film),
+      occOut: (occ, film) => this.occIsOut(occ, film),
+      big: (m) => JA ? (m.en || m.ko) : m.ko,
+      small: (m) => JA ? (m.en ? m.ko : '') : m.en,
+      cat: (c) => JA ? (CAT_JA[c] || c) : c,
+      hallStr,
+      rating: (s) => JA ? String(s).split('무료(선착순)').join('無料(先着順)').split('무료').join('無料').split('(없음)').join('(なし)') : s,
+      dow: (s) => JA ? String(s).replace(/\((토|일|월|화)\)/g, (mm, d) => '(' + DOW_JA[d] + ')') : s,
+      dowChar: (s) => JA ? (DOW_JA[s] || s) : s,
+      link: (u) => (JA && typeof u === 'string' && u.includes('://www.bifan.kr/') && !u.includes('/eng/')) ? u.replace('://www.bifan.kr/', '://www.bifan.kr/eng/') : u
+    };
+    const T_KO = { title:'BIFAN 상영작 리스트', fest:'부천국제판타스틱영화제', rank:'랭킹순', time:'상영일시순', searchPh:'제목 · 분류 · 상영관 검색', unit:'건', venueMode:'상영관별 보기', venueLabel:'상영관', dayLabel:'요일', hRank:'랭킹', hTitle:'제목', hCat:'분류', hVenue:'상영관', hTime:'상영일시', ratingH:'등급 / 이벤트', link:'링크', ratingHint:'체크된 항목이 포함된 상영만 표시', view:'보기', mapLabel:'지도에서 상영관 보기', screenings:'회 상영', unknownRt:'러닝타임 미확인 (길이 추정)', allOn:'전체 해제', allOff:'전체 선택', langBtn:'日本語', newBadge:'관람 불가', legendOut:'빗금친 블록은 내가 못 보는 시간대(참고용)', profileLabel:'프로필', addProfileTxt:'+ 새 프로필', editHint:'각 작품의 랭킹 칸을 눌러 S~F로 평가하거나 “관람 불가”로 표시하세요. 변경사항은 이 브라우저에 자동 저장됩니다.', rename:'이름 변경', del:'삭제', clearTxt:'지우기', myProfile:'내 프로필', delConfirm:'삭제 확인', cancel:'취소', confirm:'확인', namePh:'프로필 이름', byCat:'부문별', mainName:'메인', jumpLabel:'부문 바로가기' };
+    const T_JA = { title:'BIFAN 上映作品リスト', fest:'富川国際ファンタスティック映画祭', rank:'ランキング順', time:'上映日時順', searchPh:'タイトル・部門・上映館で検索', unit:'件', venueMode:'上映館別に表示', venueLabel:'上映館', dayLabel:'曜日', hRank:'ランク', hTitle:'タイトル', hCat:'部門', hVenue:'上映館', hTime:'上映日時', ratingH:'レーティング / イベント', link:'リンク', ratingHint:'チェックした項目を含む上映のみ表示', view:'見る', mapLabel:'地図で上映館を見る', screenings:'回上映', unknownRt:'上映時間未確認（長さは推定）', allOn:'すべて解除', allOff:'すべて選択', langBtn:'한국어', newBadge:'観られない', legendOut:'斜線のブロックは私が観られない時間帯（参考）', profileLabel:'プロフィール', addProfileTxt:'+ 新規プロフィール', editHint:'各作品のランク欄を押して S〜F で評価、または「観られない」に設定できます。変更はこのブラウザに自動保存されます。', rename:'名前変更', del:'削除', clearTxt:'クリア', myProfile:'私のプロフィール', delConfirm:'削除確認', cancel:'キャンセル', confirm:'確定', namePh:'プロフィール名', byCat:'部門別', mainName:'メイン', jumpLabel:'部門へ移動' };
+    const t = JA ? T_JA : T_KO;
+
+    // rating / event chips
+    const RORDER = ['G','12','15','19','SG','GV','FREE','무료','무료(선착순)','EVENT','★','(없음)'];
+    const rcount = {};
+    qbase.forEach(m => m.ratingTokens.forEach(t => rcount[t] = (rcount[t] || 0) + 1));
+    const rlist = RORDER.filter(t => rcount[t]).concat(Object.keys(rcount).filter(t => !RORDER.includes(t)));
+    const rBase = "font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:6px 11px;border:1px solid;border-radius:8px;cursor:pointer;";
+    const ratingChips = rlist.map(t => ({
+      label: L.rating(t), count: rcount[t],
+      onClick: () => this.setState(s => ({ ratingOff: s.ratingOff.includes(t) ? s.ratingOff.filter(x => x !== t) : [...s.ratingOff, t] })),
+      style: rBase + (!ratingOff.includes(t)
+        ? 'background:oklch(0.63 0.21 25);border-color:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);'
+        : 'background:oklch(0.2 0.01 60);border-color:oklch(0.3 0.01 60);color:oklch(0.5 0.01 70);')
+    }));
+
+    // venue (building) filtering
+    const activeBuilding = (venueMode && venue !== 'all') ? venue : null;
+    const vbase = activeBuilding ? base.filter(m => m.buildings.includes(activeBuilding)) : base;
+
+    // RANK ROWS: one per film, ordered by active profile's ranking
+    const isMain = this.state.activeId === 'main';
+    const editable = this.state.activeId !== 'base' && !isMain;
+    const editMovieId = this.state.editMovie;
+    const TIERS = ['S','A','B','C','D','E','F'];
+    const TCOL = { S:'oklch(0.63 0.21 25)', A:'oklch(0.66 0.16 33)', B:'oklch(0.7 0.115 45)', C:'oklch(0.55 0.07 55)', D:'oklch(0.42 0.045 60)', E:'oklch(0.33 0.025 60)', F:'oklch(0.27 0.015 60)' };
+    const tbBase = "font-family:'JetBrains Mono',sans-serif;font-size:12.5px;font-weight:700;width:32px;height:32px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;";
+    const rankRows = vbase.slice().sort((a, b) => {
+      const d = this.letterOrder(this.rankLetterOf(a)) - this.letterOrder(this.rankLetterOf(b));
+      if (d) return d;
+      return (a.sortTime || 0) - (b.sortTime || 0);
+    }).map(m => {
+      const letter = this.rankLetterOf(m);
+      const out = this.isFilmOut(m);
+      const vchips = this.venueChipsOf(m);
+      return {
+        ...m,
+        _rawCat: m.category,
+        ko: L.big(m), en: L.small(m), category: L.cat(m.category), link: L.link(m.link),
+        venue: L.hallStr(vchips[0] ? vchips[0].display : m.venue), rating: L.rating(m.rating), showtime: L.dow(m.showtime),
+        venueChips: vchips.map(c => ({ ...c, display: L.hallStr(c.display) })),
+        rankLabel: letter || '–', rankStyle: this.rankStyle(letter),
+        rankTriggerStyle: this.rankStyle(letter) + 'cursor:pointer;padding:0;' + (letter ? 'border:none;' : ''),
+        noLink: !m.hasLink,
+        isNew: out,
+        dimStyle: out ? 'opacity:0.55;' : '',
+        editable,
+        editOpen: editable && editMovieId === m.id,
+        toggleEdit: () => this.setState(s => ({ editMovie: s.editMovie === m.id ? null : m.id })),
+        tierBtns: TIERS.map(Lx => ({
+          label: Lx,
+          onClick: () => this.setFilmRank(m.id, Lx),
+          style: tbBase + (letter === Lx
+            ? 'background:' + TCOL[Lx] + ';color:oklch(0.15 0.008 60);border:1px solid ' + TCOL[Lx] + ';'
+            : 'background:oklch(0.22 0.01 60);color:oklch(0.7 0.01 70);border:1px solid oklch(0.32 0.01 60);')
+        })),
+        outBtn: {
+          onClick: () => this.toggleFilmOut(m.id),
+          style: "font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;" + (out
+            ? 'background:oklch(0.4 0.02 60);color:oklch(0.9 0.01 80);border:1px dashed oklch(0.55 0.02 60);'
+            : 'background:oklch(0.22 0.01 60);color:oklch(0.68 0.01 70);border:1px solid oklch(0.32 0.01 60);')
+        },
+        onClear: () => this.clearFilm(m.id),
+        venueSingle: vchips.length === 1,
+        venueMulti: vchips.length > 1,
+        venueUrl: (vchips[0] && vchips[0].url) || null,
+        venueHasUrl: !!(vchips[0] && vchips[0].url),
+        venueOpen: this.state.openVenue === m.id,
+        toggleVenue: () => this.setState(s => ({ openVenue: s.openVenue === m.id ? null : m.id }))
+      };
+    });
+
+    // CATEGORY (부문별) grouping — used by the view-only 메인 tab
+    const catOrder = [];
+    this.state.movies.forEach(m => { if (m.category && !catOrder.includes(m.category)) catOrder.push(m.category); });
+    const rowsByCat = {};
+    rankRows.forEach(r => { (rowsByCat[r._rawCat] = rowsByCat[r._rawCat] || []).push(r); });
+    const catSections = catOrder.filter(c => rowsByCat[c]).map((c, i) => ({
+      id: 'catsec-' + i,
+      name: L.cat(c),
+      count: rowsByCat[c].length,
+      films: rowsByCat[c].slice().sort((a, b) => (a.sortTime || 0) - (b.sortTime || 0))
+    }));
+    const catJumpButtons = catSections.map(s => ({
+      label: s.name + ' · ' + s.count,
+      onClick: () => this.scrollToCat(s.id),
+      style: "font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:7px 13px;border:1px solid oklch(0.34 0.03 55);border-radius:20px;cursor:pointer;background:oklch(0.23 0.02 55);color:oklch(0.82 0.03 55);white-space:nowrap;"
+    }));
+
+    // TIMETABLE: calendar-style day view. Time flows down the vertical axis;
+    // screenings that overlap in time are packed into side-by-side columns.
+    const timetableDays = this.buildTimetable(vbase, day, activeBuilding, L);
+    const timeCount = timetableDays.reduce((n, d) => n + d.count, 0);
+
+    // building (venue) buttons
+    const ORDER = ['CGV소풍','한국만화박물관','메가박스 부천스타필드시티','솔안아트홀','현대백화점 중동점 하늘정원','오정아트홀','부천시청','힐스테이트 소사역 달스퀘어 갤러리','롯데시네마 부천'];
+    const alias = { '메가박스 부천스타필드시티':'메가박스', '현대백화점 중동점 하늘정원':'현대백화점 하늘정원', '힐스테이트 소사역 달스퀘어 갤러리':'힐스테이트 달스퀘어', '한국만화박물관':'한국만화박물관 · 어울마당 · 큐브', '부천시청':'부천시청 잔디광장' };
+    const aliasJa = { '메가박스 부천스타필드시티':'メガボックス富川スターフィールドシティ', '현대백화점 중동점 하늘정원':'現代百貨店 空の庭園', '힐스테이트 소사역 달스퀘어 갤러리':'ヒルステート素砂駅 タルスクエア', '한국만화박물관':'韓国漫画博物館・オウルマダン・キューブ', '부천시청':'富川市庁 芝生広場', 'CGV소풍':'CGVソプン', '솔안아트홀':'ソラン・アートホール', '오정아트홀':'梧亭アートホール' };
+    const present = {};
+    this.state.movies.filter(m => this.matchQuery(m, q)).forEach(m => m.buildings.forEach(b => present[b] = (present[b] || 0) + 1));
+    const buildingList = ORDER.filter(b => present[b]);
+    const bBase = "font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:600;padding:7px 13px;border:1px solid;border-radius:9px;cursor:pointer;";
+    const buildingButtons = buildingList.map(b => ({
+      label: (JA ? (aliasJa[b] || BLDG_JA[b] || b) : (alias[b] || b)) + ' · ' + present[b],
+      onClick: () => this.setState({ venue: b }),
+      style: bBase + (venue === b
+        ? 'background:oklch(0.63 0.21 25);border-color:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);'
+        : 'background:oklch(0.2 0.01 60);border-color:oklch(0.3 0.01 60);color:oklch(0.72 0.01 70);')
+    }));
+    const toggleVenueMode = () => this.setState(s => ({
+      venueMode: !s.venueMode,
+      venue: (!s.venueMode && (s.venue === 'all')) ? (buildingList[0] || 'all') : s.venue
+    }));
+
+    // day tabs
+    const dayDefs = JA ? [['all','全体'],['fri','金'],['sat','土'],['sun','日'],['mon','月'],['tue','火']] : [['all','전체'],['fri','금'],['sat','토'],['sun','일'],['mon','월'],['tue','화']];
+    const tabBase = "font-family:'Pretendard',sans-serif;font-size:13px;font-weight:600;padding:7px 15px;border:1px solid;border-radius:9px;cursor:pointer;";
+    const dayTabs = dayDefs.map(([key, label]) => ({
+      label,
+      onClick: () => this.setState({ day: key }),
+      style: tabBase + (day === key
+        ? 'background:oklch(0.63 0.21 25);border-color:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);'
+        : 'background:oklch(0.2 0.01 60);border-color:oklch(0.3 0.01 60);color:oklch(0.7 0.01 70);')
+    }));
+
+    const segBase = "font-family:'Pretendard',sans-serif;font-size:13.5px;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;";
+    const segOn = segBase + 'background:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);';
+    const segOff = segBase + 'background:transparent;color:oklch(0.66 0.01 70);';
+
+    return {
+      rankRows,
+      timetableDays,
+      dayTabs,
+      buildingButtons,
+      venueMode,
+      showVenueBar: venueMode && buildingList.length > 0,
+      toggleVenueMode,
+      venueBoxStyle: 'display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:5px;font-size:11px;font-weight:800;' +
+        (venueMode ? 'background:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);border:1px solid oklch(0.63 0.21 25);' : 'background:transparent;color:transparent;border:1.5px solid oklch(0.4 0.01 60);'),
+      venueCheck: venueMode ? '✓' : '',
+      venuePopoverOpen: this.state.openVenue != null,
+      closeVenue: () => this.setState({ openVenue: null }),
+      ratingChips,
+      ratingPanelOpen: this.state.ratingPanelOpen,
+      toggleRatingPanel: () => this.setState(s => ({ ratingPanelOpen: !s.ratingPanelOpen, openVenue: null })),
+      closeRating: () => this.setState({ ratingPanelOpen: false }),
+      toggleAllLabel: (rlist.length && rlist.every(tk => ratingOff.includes(tk))) ? t.allOff : t.allOn,
+      toggleAllRatings: () => this.setState(s => ({
+        ratingOff: rlist.every(t => s.ratingOff.includes(t)) ? [] : rlist.slice()
+      })),
+      ratingCaretStyle: 'font-size:9px;color:' + (ratingOff.length ? 'oklch(0.72 0.18 32)' : 'oklch(0.5 0.01 70)') + ';',
+      isRank: mode === 'rank',
+      isPlainRank: mode === 'rank' && !isMain,
+      isCatView: isMain && mode === 'rank',
+      isMain,
+      catSections,
+      catJumpButtons,
+      seg1Label: isMain ? t.byCat : t.rank,
+      isTime: mode === 'time',
+      count: mode === 'rank' ? rankRows.length : timeCount,
+      query: this.state.query,
+      setRank: () => this.setState({ mode: 'rank' }),
+      setTime: () => this.setState({ mode: 'time' }),
+      onSearch: (e) => this.setState({ query: e.target.value }),
+      segRankStyle: mode === 'rank' ? segOn : segOff,
+      segTimeStyle: mode === 'time' ? segOn : segOff,
+      t,
+      isJa: JA,
+      isKo: !JA,
+      isMobile,
+      isDesktop: !isMobile,
+      profilePills: [{ id:'main', name: t.mainName, base:false }, { id:'base', name: 'Kim', base:true }].concat(this.state.profiles.map(p => ({ id:p.id, name:p.name, base:false }))).map(p => ({
+        id: p.id, name: p.name, base: p.base,
+        onClick: () => this.setActiveProfile(p.id),
+        style: "font-family:'Pretendard',sans-serif;font-size:13px;font-weight:600;padding:7px 15px;border:1px solid;border-radius:999px;cursor:pointer;white-space:nowrap;" + (this.state.activeId === p.id
+          ? 'background:oklch(0.63 0.21 25);border-color:oklch(0.63 0.21 25);color:oklch(0.15 0.008 60);'
+          : 'background:oklch(0.2 0.01 60);border-color:oklch(0.3 0.01 60);color:oklch(0.72 0.01 70);')
+      })),
+      addProfile: () => this.startAddProfile(),
+      closeEdit: () => this.setState({ editMovie: null }),
+      activeIsBase: this.state.activeId === 'base',
+      activeIsCustom: !isMain && this.state.activeId !== 'base',
+      startRename: () => this.startRenameProfile(),
+      nameEditing: this.state.nameEditId !== null,
+      nameEditingOff: this.state.nameEditId === null,
+      nameEditVal: this.state.nameEditVal,
+      onNameInput: (e) => this.changeNameVal(e.target.value),
+      onNameKey: (e) => { if (e.key === 'Enter') this.commitNameEdit(); else if (e.key === 'Escape') this.cancelNameEdit(); },
+      commitName: () => this.commitNameEdit(),
+      cancelName: () => this.cancelNameEdit(),
+      confirmDel: this.state.confirmDel,
+      confirmDelOff: !this.state.confirmDel,
+      requestDelete: () => this.requestDelete(),
+      cancelDelete: () => this.cancelDelete(),
+      confirmDelete: () => this.confirmDeleteProfile(),
+      toggleLang: () => this.setState(s => ({ lang: s.lang === 'ja' ? 'ko' : 'ja', openVenue: null, ratingPanelOpen: false })),
+      langBtnStyle: "display:inline-flex;align-items:center;gap:7px;background:oklch(0.2 0.01 60);border:1px solid oklch(0.3 0.01 60);border-radius:10px;padding:10px 15px;color:oklch(0.86 0.01 70);font-family:'Pretendard',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;"
+    };
+  }
+}
+</script>
+</body>
+</html>
